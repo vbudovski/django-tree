@@ -1,0 +1,46 @@
+*.mwb.bak
+*.pyc
+*.gz
+*.coverage
+
+.DS_Store
+.idea
+.tox
+
+.env
+.swp
+
+SECRET_KEY
+
+# Third party packages
+bower_components
+node_modules
+requirements/src
+
+# dev files
+frontend-react/dev/*
+frontend-react/dist/report-analyze.html
+venv/
+.prettierrc
+
+# Media files
+assets/
+media/
+
+# Log files
+log/
+npm-debug.log
+.coverage
+django-root/htmlcov
+
+# Source Map
+frontend-react/dist-source-maps
+
+# Temp files - necessary for DjradStaticMetaDataFinder
+django-root/temp/*
+
+django-root/django_site/resources/__MACOSX/
+
+# Screenshots and videos stored by Cypress
+cypress/screenshots
+cypress/videos
