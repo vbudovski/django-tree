@@ -44,3 +44,5 @@ django-root/django_site/resources/__MACOSX/
 # Screenshots and videos stored by Cypress
 cypress/screenshots
 cypress/videos
+
+coverage.xml
