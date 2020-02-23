@@ -18,10 +18,9 @@ from collections import OrderedDict
 from django.test import TestCase
 
 from tests.models import TreeNode
-from django_tree.services import build_tree
 
 
-class TreeTestCase(TestCase):
+class TreeSelectTestCase(TestCase):
     def setUp(self):
         self.node_0 = TreeNode.objects.create(name='0')
         self.node_1 = TreeNode.objects.create(name='1', previous=self.node_0)
@@ -43,7 +42,7 @@ class TreeTestCase(TestCase):
         self.assertSequenceEqual(TreeNode.objects.in_order(), nodes_in_order)
 
     def test_build_tree(self):
-        node_tree = build_tree()
+        node_tree = TreeNode.objects.build_tree()
 
         expected_node_tree = OrderedDict((
             (self.node_0.pk, {

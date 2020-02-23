@@ -13,9 +13,12 @@
 # limitations under the License.
 
 
+from collections import OrderedDict
 import functools
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db import transaction
 from django.db.models import Case
 from django.db.models import Value
 from django.db.models import When
@@ -87,6 +90,48 @@ class BaseTreeNodeManager(CTEManager):
                 'index',
             )
         )
+
+    def build_tree(self) -> OrderedDict:
+        ordered_nodes = self.in_order()
+
+        node_tree = OrderedDict()
+        for node in ordered_nodes:
+            if node.depth == 0:
+                insert_into = node_tree
+            else:
+                insert_into = node_tree[node.parent_id]['children']
+
+            insert_into[node.pk] = {
+                'node': node,
+                'children': OrderedDict(),
+            }
+
+        return node_tree
+
+    @transaction.atomic
+    def insert_before(self, node: 'BaseTreeNode', new_node: 'BaseTreeNode'):
+        old_previous = node.previous
+
+        node.previous = new_node
+        node.save(update_fields=['previous'])
+
+        new_node.parent = node.parent
+        new_node.previous = old_previous
+        new_node.save(update_fields=['parent', 'previous'])
+
+    @transaction.atomic
+    def insert_after(self, node: 'BaseTreeNode', new_node: 'BaseTreeNode'):
+        try:
+            old_next = node.next
+        except ObjectDoesNotExist:
+            pass
+        else:
+            old_next.previous = new_node
+            old_next.save(update_fields=['previous'])
+
+        new_node.parent = node.parent
+        new_node.previous = node
+        new_node.save(update_fields=['parent', 'previous'])
 
 
 class BaseTreeNode(models.Model):

@@ -27,7 +27,6 @@ Simply extend the `BaseTreeNode` class in your application: e.g.
 from django.db import models
 
 from django_tree.models import BaseTreeNode
-from django_tree.services import build_tree
 
 
 class Category(BaseTreeNode):
@@ -37,5 +36,5 @@ class Category(BaseTreeNode):
         return self.name
 
 # Will contain an OrderedDict of categories organised into a tree structure.
-categories = build_tree()
+categories = Category.objects.build_tree()
 ```
