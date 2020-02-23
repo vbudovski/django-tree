@@ -12,7 +12,7 @@ def pytest_configure(config):
             }
         },
         INSTALLED_APPS=(
-            'tree',
+            'django_tree',
             'tests',
         ),
     )

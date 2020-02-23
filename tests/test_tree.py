@@ -18,7 +18,7 @@ from collections import OrderedDict
 from django.test import TestCase
 
 from tests.models import TreeNode
-from tree.services import build_tree
+from django_tree.services import build_tree
 
 
 class TreeTestCase(TestCase):

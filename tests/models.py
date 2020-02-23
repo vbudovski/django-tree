@@ -1,6 +1,6 @@
 from django.db import models
 
-from tree.models import BaseTreeNode
+from django_tree.models import BaseTreeNode
 
 
 class TreeNode(BaseTreeNode):

@@ -12,3 +12,30 @@ A tree structure for hierarchical data. Optimised for fast insertion/moving of n
 
 * Django 2.2+
 * Python 3.6+
+
+
+## Installation
+
+* Add `django_tree` to `INSTALLED_APPS`.
+
+
+## Usage
+
+Simply extend the `BaseTreeNode` class in your application: e.g.
+
+```python
+from django.db import models
+
+from django_tree.models import BaseTreeNode
+from django_tree.services import build_tree
+
+
+class Category(BaseTreeNode):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+# Will contain an OrderedDict of categories organised into a tree structure.
+categories = build_tree()
+```

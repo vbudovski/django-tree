@@ -17,4 +17,4 @@ from django.apps import AppConfig
 
 
 class TreeConfig(AppConfig):
-    name = 'tree'
+    name = 'django_tree'
