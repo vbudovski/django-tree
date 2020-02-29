@@ -14,59 +14,121 @@
 
 
 from collections import OrderedDict
+from typing import Optional
 
+from django.db import transaction
 from django.test import TestCase
 
 from tests.models import TreeNode
 
 
 class TreeSelectTestCase(TestCase):
+    @transaction.atomic
+    def add_children(self, parent: Optional[TreeNode], depth: int, max_depth: int):
+        if parent is None:
+            prefix = ''
+        else:
+            prefix = f'{parent.name}_'
+
+        nodes = []
+        for i in range(3):
+            try:
+                previous = nodes[i - 1]
+            except IndexError:
+                previous = None
+
+            new_node = TreeNode.objects.create(name=f'{prefix}{i}', parent=parent, previous=previous)
+            nodes.append(new_node)
+
+        if depth < max_depth:
+            for node in nodes:
+                self.add_children(node, depth + 1, max_depth)
+
     def setUp(self):
-        self.node_0 = TreeNode.objects.create(name='0')
-        self.node_1 = TreeNode.objects.create(name='1', previous=self.node_0)
-        self.node_0_0 = TreeNode.objects.create(name='0_0', parent=self.node_0)
-        self.node_0_1 = TreeNode.objects.create(name='0_1', parent=self.node_0, previous=self.node_0_0)
-        self.node_1_0 = TreeNode.objects.create(name='1_0', parent=self.node_1)
-        self.node_1_1 = TreeNode.objects.create(name='1_1', parent=self.node_1, previous=self.node_1_0)
+        self.add_children(None, 0, 1)
 
     def test_select_in_order(self):
         nodes_in_order = (
-            self.node_0,
-            self.node_1,
-            self.node_0_0,
-            self.node_1_0,
-            self.node_0_1,
-            self.node_1_1,
+            {'name': '0', 'depth': 0, 'index': 0},
+            {'name': '1', 'depth': 0, 'index': 1},
+            {'name': '2', 'depth': 0, 'index': 2},
+            {'name': '0_0', 'depth': 1, 'index': 0},
+            {'name': '1_0', 'depth': 1, 'index': 0},
+            {'name': '2_0', 'depth': 1, 'index': 0},
+            {'name': '0_1', 'depth': 1, 'index': 1},
+            {'name': '1_1', 'depth': 1, 'index': 1},
+            {'name': '2_1', 'depth': 1, 'index': 1},
+            {'name': '0_2', 'depth': 1, 'index': 2},
+            {'name': '1_2', 'depth': 1, 'index': 2},
+            {'name': '2_2', 'depth': 1, 'index': 2},
         )
 
-        self.assertSequenceEqual(TreeNode.objects.in_order(), nodes_in_order)
+        self.assertSequenceEqual(TreeNode.objects.in_order().values('name', 'depth', 'index'), nodes_in_order)
 
     def test_build_tree(self):
+        node_0 = TreeNode.objects.get(name='0')
+        node_0_0 = TreeNode.objects.get(name='0_0')
+        node_0_1 = TreeNode.objects.get(name='0_1')
+        node_0_2 = TreeNode.objects.get(name='0_2')
+        node_1 = TreeNode.objects.get(name='1')
+        node_1_0 = TreeNode.objects.get(name='1_0')
+        node_1_1 = TreeNode.objects.get(name='1_1')
+        node_1_2 = TreeNode.objects.get(name='1_2')
+        node_2 = TreeNode.objects.get(name='2')
+        node_2_0 = TreeNode.objects.get(name='2_0')
+        node_2_1 = TreeNode.objects.get(name='2_1')
+        node_2_2 = TreeNode.objects.get(name='2_2')
+
         node_tree = TreeNode.objects.build_tree()
 
         expected_node_tree = OrderedDict((
-            (self.node_0.pk, {
-                'node': self.node_0,
+            (node_0.pk, {
+                'node': node_0,
                 'children': OrderedDict((
-                    (self.node_0_0.pk, {
-                        'node': self.node_0_0,
+                    (node_0_0.pk, {
+                        'node': node_0_0,
                         'children': OrderedDict(),
                     }),
-                    (self.node_0_1.pk, {
-                        'node': self.node_0_1,
+                    (node_0_1.pk, {
+                        'node': node_0_1,
+                        'children': OrderedDict(),
+                    }),
+                    (node_0_2.pk, {
+                        'node': node_0_2,
                         'children': OrderedDict(),
                     }),
                 )),
             }),
-            (self.node_1.pk, {
-                'node': self.node_1,
+            (node_1.pk, {
+                'node': node_1,
                 'children': OrderedDict((
-                    (self.node_1_0.pk, {
-                        'node': self.node_1_0,
+                    (node_1_0.pk, {
+                        'node': node_1_0,
                         'children': OrderedDict(),
                     }),
-                    (self.node_1_1.pk, {
-                        'node': self.node_1_1,
+                    (node_1_1.pk, {
+                        'node': node_1_1,
+                        'children': OrderedDict(),
+                    }),
+                    (node_1_2.pk, {
+                        'node': node_1_2,
+                        'children': OrderedDict(),
+                    }),
+                )),
+            }),
+            (node_2.pk, {
+                'node': node_2,
+                'children': OrderedDict((
+                    (node_2_0.pk, {
+                        'node': node_2_0,
+                        'children': OrderedDict(),
+                    }),
+                    (node_2_1.pk, {
+                        'node': node_2_1,
+                        'children': OrderedDict(),
+                    }),
+                    (node_2_2.pk, {
+                        'node': node_2_2,
                         'children': OrderedDict(),
                     }),
                 )),

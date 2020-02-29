@@ -88,6 +88,7 @@ class BaseTreeNodeManager(CTEManager):
             .order_by(
                 'depth',
                 'index',
+                'pk',
             )
         )
 
@@ -95,16 +96,22 @@ class BaseTreeNodeManager(CTEManager):
         ordered_nodes = self.in_order()
 
         node_tree = OrderedDict()
+        paths = OrderedDict()
         for node in ordered_nodes:
-            if node.depth == 0:
-                insert_into = node_tree
+            if node.parent_id is None:
+                paths[node.pk] = [node.pk]
             else:
-                insert_into = node_tree[node.parent_id]['children']
+                paths[node.pk] = paths[node.parent_id] + [node.pk]
 
-            insert_into[node.pk] = {
-                'node': node,
-                'children': OrderedDict(),
-            }
+            insert_into = node_tree
+            for node_id in paths[node.pk]:
+                if node_id in insert_into:
+                    insert_into = insert_into[node_id]['children']
+                else:
+                    insert_into[node_id] = {
+                        'node': node,
+                        'children': OrderedDict(),
+                    }
 
         return node_tree
 
