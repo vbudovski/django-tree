@@ -14,83 +14,61 @@
 
 
 from collections import OrderedDict
-import functools
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db import transaction
-from django.db.models import Case
-from django.db.models import Value
-from django.db.models import When
-from django.db.models.expressions import OuterRef
-from django.db.models.expressions import Subquery
-from django_cte import CTEManager
-from django_cte import CTEQuerySet
-from django_cte import With
 
 
-class BaseTreeNodeManager(CTEManager):
+class BaseTreeNodeManager(models.Manager):
     def in_order(self):
-        def _make_cte(cte: CTEManager, key: str, result: str) -> CTEQuerySet:
-            return (
-                self.get_queryset()
-                .filter(**{key: None})
-                .values(
-                    'id',
-                    key,
-                    **{result: Value(0, output_field=models.IntegerField())},
+        table_name = self.model._meta.db_table
+        query = f"""
+            SELECT depth_cte.id, depth, index
+            FROM
+              (
+                WITH RECURSIVE depth_cte AS (
+                  SELECT id, parent_id, 0 as depth
+                  FROM {table_name}
+                  WHERE parent_id IS NULL
+                  UNION ALL
+                    SELECT
+                      t.id,
+                      t.parent_id,
+                      CASE
+                        WHEN t.parent_id = depth_cte.id THEN depth_cte.depth + 1
+                        ELSE 0
+                      END AS depth
+                    FROM {table_name} t
+                    INNER JOIN depth_cte ON depth_cte.id = t.parent_id
                 )
-                .union(
-                    cte
-                    .join(
-                        self.model,
-                        **{key: cte.col.pk},
-                    )
-                    .values(
-                        'id',
-                        key,
-                        **{
-                            result: Case(
-                                When(
-                                    **{key: cte.col.pk},
-                                    then=getattr(cte.col, result) + Value(1, output_field=models.IntegerField()),
-                                ),
-                                default=Value(0, output_field=models.IntegerField()),
-                            ),
-                        },
-                    ),
-                    all=True,
+                SELECT *
+                FROM depth_cte
+              ) depth_cte,
+              (
+                WITH RECURSIVE index_cte AS (
+                  SELECT id, previous_id, 0 as index
+                  FROM {table_name}
+                  WHERE previous_id IS NULL
+                  UNION ALL
+                    SELECT
+                      t.id,
+                      t.previous_id,
+                      CASE
+                        WHEN t.previous_id = index_cte.id THEN index_cte.index + 1
+                        ELSE 0
+                      END AS index
+                    FROM {table_name} t
+                    INNER JOIN index_cte ON index_cte.id = t.previous_id
                 )
-            )
+                SELECT *
+                FROM index_cte
+              ) index_cte
+            WHERE depth_cte.id = index_cte.id
+            ORDER BY depth, index, id
+        """
 
-        def make_annotated_query(key: str, result: str):
-            make_cte = functools.partial(_make_cte, key=key, result=result)
-
-            cte = With.recursive(make_cte)
-            return (
-                cte
-                .join(
-                    self.model,
-                    pk=cte.col.pk,
-                )
-                .with_cte(cte)
-                .annotate(**{result: getattr(cte.col, result)})
-            )
-
-        nodes_by_index = make_annotated_query('previous', 'index')
-        nodes_by_depth = make_annotated_query('parent', 'depth')
-
-        return (
-            nodes_by_depth
-            .annotate(
-                index=Subquery(nodes_by_index.filter(pk=OuterRef('pk')).values('index')),
-            )
-            .order_by(
-                'depth',
-                'index',
-                'pk',
-            )
-        )
+        return self.get_queryset().raw(query)
 
     def build_tree(self) -> OrderedDict:
         ordered_nodes = self.in_order()

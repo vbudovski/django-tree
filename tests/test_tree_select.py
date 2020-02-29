@@ -48,22 +48,35 @@ class TreeSelectTestCase(TestCase):
         self.add_children(None, 0, 1)
 
     def test_select_in_order(self):
+        node_0 = TreeNode.objects.get(name='0')
+        node_0_0 = TreeNode.objects.get(name='0_0')
+        node_0_1 = TreeNode.objects.get(name='0_1')
+        node_0_2 = TreeNode.objects.get(name='0_2')
+        node_1 = TreeNode.objects.get(name='1')
+        node_1_0 = TreeNode.objects.get(name='1_0')
+        node_1_1 = TreeNode.objects.get(name='1_1')
+        node_1_2 = TreeNode.objects.get(name='1_2')
+        node_2 = TreeNode.objects.get(name='2')
+        node_2_0 = TreeNode.objects.get(name='2_0')
+        node_2_1 = TreeNode.objects.get(name='2_1')
+        node_2_2 = TreeNode.objects.get(name='2_2')
+
         nodes_in_order = (
-            {'name': '0', 'depth': 0, 'index': 0},
-            {'name': '1', 'depth': 0, 'index': 1},
-            {'name': '2', 'depth': 0, 'index': 2},
-            {'name': '0_0', 'depth': 1, 'index': 0},
-            {'name': '1_0', 'depth': 1, 'index': 0},
-            {'name': '2_0', 'depth': 1, 'index': 0},
-            {'name': '0_1', 'depth': 1, 'index': 1},
-            {'name': '1_1', 'depth': 1, 'index': 1},
-            {'name': '2_1', 'depth': 1, 'index': 1},
-            {'name': '0_2', 'depth': 1, 'index': 2},
-            {'name': '1_2', 'depth': 1, 'index': 2},
-            {'name': '2_2', 'depth': 1, 'index': 2},
+            node_0,
+            node_1,
+            node_2,
+            node_0_0,
+            node_1_0,
+            node_2_0,
+            node_0_1,
+            node_1_1,
+            node_2_1,
+            node_0_2,
+            node_1_2,
+            node_2_2,
         )
 
-        self.assertSequenceEqual(TreeNode.objects.in_order().values('name', 'depth', 'index'), nodes_in_order)
+        self.assertSequenceEqual(TreeNode.objects.in_order(), nodes_in_order)
 
     def test_build_tree(self):
         node_0 = TreeNode.objects.get(name='0')

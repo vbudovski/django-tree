@@ -19,7 +19,7 @@ setup(
     author_email='vbudovski@gmail.com',
     packages=find_packages(exclude=['tests*']),
     include_package_data=True,
-    install_requires=["django>=2.2", "django_cte>=1.1.4"],
+    install_requires=["django>=2.2"],
     python_requires=">=3.6",
     classifiers=[
         'Development Status :: 3 - Alpha',
