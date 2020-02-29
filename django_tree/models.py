@@ -129,6 +129,14 @@ class BaseTreeNodeManager(CTEManager):
     @transaction.atomic
     def insert_after(self, node: 'BaseTreeNode', new_node: 'BaseTreeNode'):
         try:
+            new_node_next = new_node.next
+        except ObjectDoesNotExist:
+            pass
+        else:
+            new_node_next.previous = new_node.previous
+            new_node_next.save(update_fields=['previous'])
+
+        try:
             old_next = node.next
         except ObjectDoesNotExist:
             pass
