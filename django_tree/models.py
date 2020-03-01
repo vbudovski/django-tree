@@ -43,7 +43,7 @@ class BaseTreeNodeManager(models.Manager):
                     FROM {table_name} t
                     INNER JOIN depth_cte ON depth_cte.id = t.parent_id
                 )
-                SELECT *
+                SELECT id, depth
                 FROM depth_cte
             ) depth_cte,
             (
@@ -62,7 +62,7 @@ class BaseTreeNodeManager(models.Manager):
                     FROM {table_name} t
                     INNER JOIN index_cte ON index_cte.id = t.previous_id
                 )
-                SELECT *
+                SELECT id, index
                 FROM index_cte
             ) index_cte
             WHERE nodes.id = depth_cte.id
