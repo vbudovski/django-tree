@@ -96,37 +96,52 @@ class BaseTreeNodeManager(models.Manager):
         return node_tree
 
     @transaction.atomic
-    def insert_before(self, node: 'BaseTreeNode', new_node: 'BaseTreeNode'):
-        old_previous = node.previous
+    def _remove(self, this: 'BaseTreeNode'):
+        # Save the nodes on either side of 'this' node.
+        this_previous = this.previous
+        try:
+            this_next = this.next
+        except ObjectDoesNotExist:
+            this_next = None
 
-        node.previous = new_node
-        node.save(update_fields=['previous'])
+        # Unlink 'this' node from the tree.
+        this.previous = None
+        this.parent = None
+        this.save(update_fields=['previous', 'parent'])
 
-        new_node.parent = node.parent
-        new_node.previous = old_previous
-        new_node.save(update_fields=['parent', 'previous'])
+        # Join the nodes on either side of 'this' to bridge the gap.
+        if this_next:
+            this_next.previous = this_previous
+            this_next.save(update_fields=['previous'])
 
     @transaction.atomic
-    def insert_after(self, node: 'BaseTreeNode', new_node: 'BaseTreeNode'):
+    def insert_before(self, before: 'BaseTreeNode', this: 'BaseTreeNode'):
+        self._remove(this)
+
+        # Link 'this' before 'before'.
+        before_previous = before.previous
+        before.previous = this
+        before.save(update_fields=['previous'])
+        this.previous = before_previous
+        this.parent = before.parent
+        this.save(update_fields=['previous', 'parent'])
+
+    @transaction.atomic
+    def insert_after(self, after: 'BaseTreeNode', this: 'BaseTreeNode'):
+        self._remove(this)
+
+        # Link 'this' after 'after.
         try:
-            new_node_next = new_node.next
+            after_next = after.next
         except ObjectDoesNotExist:
             pass
         else:
-            new_node_next.previous = new_node.previous
-            new_node_next.save(update_fields=['previous'])
+            after_next.previous = this
+            after_next.save(update_fields=['previous'])
 
-        try:
-            old_next = node.next
-        except ObjectDoesNotExist:
-            pass
-        else:
-            old_next.previous = new_node
-            old_next.save(update_fields=['previous'])
-
-        new_node.parent = node.parent
-        new_node.previous = node
-        new_node.save(update_fields=['parent', 'previous'])
+        this.previous = after
+        this.parent = after.parent
+        this.save(update_fields=['previous', 'parent'])
 
 
 class BaseTreeNode(models.Model):

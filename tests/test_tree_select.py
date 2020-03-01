@@ -14,38 +14,16 @@
 
 
 from collections import OrderedDict
-from typing import Optional
 
-from django.db import transaction
 from django.test import TestCase
 
 from tests.models import TreeNode
+from tests.utils import add_children
 
 
 class TreeSelectTestCase(TestCase):
-    @transaction.atomic
-    def add_children(self, parent: Optional[TreeNode], depth: int, max_depth: int):
-        if parent is None:
-            prefix = ''
-        else:
-            prefix = f'{parent.name}_'
-
-        nodes = []
-        for i in range(3):
-            try:
-                previous = nodes[i - 1]
-            except IndexError:
-                previous = None
-
-            new_node = TreeNode.objects.create(name=f'{prefix}{i}', parent=parent, previous=previous)
-            nodes.append(new_node)
-
-        if depth < max_depth:
-            for node in nodes:
-                self.add_children(node, depth + 1, max_depth)
-
     def setUp(self):
-        self.add_children(None, 0, 1)
+        add_children(None, 0, 1, 3)
 
     def test_select_in_order(self):
         node_0 = TreeNode.objects.get(name='0')
