@@ -24,47 +24,49 @@ class BaseTreeNodeManager(models.Manager):
     def in_order(self):
         table_name = self.model._meta.db_table
         query = f"""
-            SELECT depth_cte.id, depth, index
+            SELECT nodes.*, depth, index
             FROM
-              (
+            {table_name} nodes,
+            (
                 WITH RECURSIVE depth_cte AS (
-                  SELECT id, parent_id, 0 as depth
-                  FROM {table_name}
-                  WHERE parent_id IS NULL
-                  UNION ALL
+                    SELECT id, parent_id, 0 as depth
+                    FROM {table_name}
+                    WHERE parent_id IS NULL
+                    UNION ALL
                     SELECT
-                      t.id,
-                      t.parent_id,
-                      CASE
+                    t.id,
+                    t.parent_id,
+                    CASE
                         WHEN t.parent_id = depth_cte.id THEN depth_cte.depth + 1
                         ELSE 0
-                      END AS depth
+                    END AS depth
                     FROM {table_name} t
                     INNER JOIN depth_cte ON depth_cte.id = t.parent_id
                 )
                 SELECT *
                 FROM depth_cte
-              ) depth_cte,
-              (
+            ) depth_cte,
+            (
                 WITH RECURSIVE index_cte AS (
-                  SELECT id, previous_id, 0 as index
-                  FROM {table_name}
-                  WHERE previous_id IS NULL
-                  UNION ALL
+                    SELECT id, previous_id, 0 as index
+                    FROM {table_name}
+                    WHERE previous_id IS NULL
+                    UNION ALL
                     SELECT
-                      t.id,
-                      t.previous_id,
-                      CASE
+                    t.id,
+                    t.previous_id,
+                    CASE
                         WHEN t.previous_id = index_cte.id THEN index_cte.index + 1
                         ELSE 0
-                      END AS index
+                    END AS index
                     FROM {table_name} t
                     INNER JOIN index_cte ON index_cte.id = t.previous_id
                 )
                 SELECT *
                 FROM index_cte
-              ) index_cte
-            WHERE depth_cte.id = index_cte.id
+            ) index_cte
+            WHERE nodes.id = depth_cte.id
+            AND depth_cte.id = index_cte.id
             ORDER BY depth, index, id
         """
 
