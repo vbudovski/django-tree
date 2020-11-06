@@ -1,7 +1,8 @@
 # Django Tree
 
-[![Build Status](https://travis-ci.com/vbudovski/django-tree.svg?branch=master)](https://travis-ci.com/vbudovski/django-tree)
-[![Coverage Status](https://codecov.io/gh/vbudovski/django-tree/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/gh/vbudovski/django-tree)
+![CI](https://github.com/vbudovski/django-tree/workflows/Django%20CI/badge.svg)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/54fd3664631f52caa2e4/test_coverage)](https://codeclimate.com/github/vbudovski/django-tree/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/54fd3664631f52caa2e4/maintainability)](https://codeclimate.com/github/vbudovski/django-tree/maintainability)
 
 ## Overview
 
