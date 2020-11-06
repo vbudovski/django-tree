@@ -13,6 +13,8 @@
 # limitations under the License.
 
 
+import os
+
 import django
 
 
@@ -23,7 +25,11 @@ def pytest_configure(config):
         DATABASES={
             'default': {
                 'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'tree_test',
+                'HOST': os.environ.get("DB_HOST"),
+                'NAME': os.environ.get("DB_NAME"),
+                'USER': os.environ.get("DB_USER"),
+                'PASSWORD': os.environ.get("DB_PASSWORD"),
+                'PORT': os.environ.get("DB_PORT"),
             }
         },
         INSTALLED_APPS=(
