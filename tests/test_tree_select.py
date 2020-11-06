@@ -26,18 +26,18 @@ class TreeSelectTestCase(TestCase):
         add_children(None, 0, 1, 3)
 
     def test_select_in_order(self):
-        node_0 = TreeNode.objects.get(name='0')
-        node_0_0 = TreeNode.objects.get(name='0_0')
-        node_0_1 = TreeNode.objects.get(name='0_1')
-        node_0_2 = TreeNode.objects.get(name='0_2')
-        node_1 = TreeNode.objects.get(name='1')
-        node_1_0 = TreeNode.objects.get(name='1_0')
-        node_1_1 = TreeNode.objects.get(name='1_1')
-        node_1_2 = TreeNode.objects.get(name='1_2')
-        node_2 = TreeNode.objects.get(name='2')
-        node_2_0 = TreeNode.objects.get(name='2_0')
-        node_2_1 = TreeNode.objects.get(name='2_1')
-        node_2_2 = TreeNode.objects.get(name='2_2')
+        node_0 = TreeNode.objects.get(name="0")
+        node_0_0 = TreeNode.objects.get(name="0_0")
+        node_0_1 = TreeNode.objects.get(name="0_1")
+        node_0_2 = TreeNode.objects.get(name="0_2")
+        node_1 = TreeNode.objects.get(name="1")
+        node_1_0 = TreeNode.objects.get(name="1_0")
+        node_1_1 = TreeNode.objects.get(name="1_1")
+        node_1_2 = TreeNode.objects.get(name="1_2")
+        node_2 = TreeNode.objects.get(name="2")
+        node_2_0 = TreeNode.objects.get(name="2_0")
+        node_2_1 = TreeNode.objects.get(name="2_1")
+        node_2_2 = TreeNode.objects.get(name="2_2")
 
         nodes_in_order = (
             node_0,
@@ -57,73 +57,117 @@ class TreeSelectTestCase(TestCase):
         self.assertSequenceEqual(TreeNode.objects.in_order(), nodes_in_order)
 
     def test_build_tree(self):
-        node_0 = TreeNode.objects.get(name='0')
-        node_0_0 = TreeNode.objects.get(name='0_0')
-        node_0_1 = TreeNode.objects.get(name='0_1')
-        node_0_2 = TreeNode.objects.get(name='0_2')
-        node_1 = TreeNode.objects.get(name='1')
-        node_1_0 = TreeNode.objects.get(name='1_0')
-        node_1_1 = TreeNode.objects.get(name='1_1')
-        node_1_2 = TreeNode.objects.get(name='1_2')
-        node_2 = TreeNode.objects.get(name='2')
-        node_2_0 = TreeNode.objects.get(name='2_0')
-        node_2_1 = TreeNode.objects.get(name='2_1')
-        node_2_2 = TreeNode.objects.get(name='2_2')
+        node_0 = TreeNode.objects.get(name="0")
+        node_0_0 = TreeNode.objects.get(name="0_0")
+        node_0_1 = TreeNode.objects.get(name="0_1")
+        node_0_2 = TreeNode.objects.get(name="0_2")
+        node_1 = TreeNode.objects.get(name="1")
+        node_1_0 = TreeNode.objects.get(name="1_0")
+        node_1_1 = TreeNode.objects.get(name="1_1")
+        node_1_2 = TreeNode.objects.get(name="1_2")
+        node_2 = TreeNode.objects.get(name="2")
+        node_2_0 = TreeNode.objects.get(name="2_0")
+        node_2_1 = TreeNode.objects.get(name="2_1")
+        node_2_2 = TreeNode.objects.get(name="2_2")
 
         node_tree = TreeNode.objects.build_tree()
 
-        expected_node_tree = OrderedDict((
-            (node_0.pk, {
-                'node': node_0,
-                'children': OrderedDict((
-                    (node_0_0.pk, {
-                        'node': node_0_0,
-                        'children': OrderedDict(),
-                    }),
-                    (node_0_1.pk, {
-                        'node': node_0_1,
-                        'children': OrderedDict(),
-                    }),
-                    (node_0_2.pk, {
-                        'node': node_0_2,
-                        'children': OrderedDict(),
-                    }),
-                )),
-            }),
-            (node_1.pk, {
-                'node': node_1,
-                'children': OrderedDict((
-                    (node_1_0.pk, {
-                        'node': node_1_0,
-                        'children': OrderedDict(),
-                    }),
-                    (node_1_1.pk, {
-                        'node': node_1_1,
-                        'children': OrderedDict(),
-                    }),
-                    (node_1_2.pk, {
-                        'node': node_1_2,
-                        'children': OrderedDict(),
-                    }),
-                )),
-            }),
-            (node_2.pk, {
-                'node': node_2,
-                'children': OrderedDict((
-                    (node_2_0.pk, {
-                        'node': node_2_0,
-                        'children': OrderedDict(),
-                    }),
-                    (node_2_1.pk, {
-                        'node': node_2_1,
-                        'children': OrderedDict(),
-                    }),
-                    (node_2_2.pk, {
-                        'node': node_2_2,
-                        'children': OrderedDict(),
-                    }),
-                )),
-            }),
-        ))
+        expected_node_tree = OrderedDict(
+            (
+                (
+                    node_0.pk,
+                    {
+                        "node": node_0,
+                        "children": OrderedDict(
+                            (
+                                (
+                                    node_0_0.pk,
+                                    {
+                                        "node": node_0_0,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                                (
+                                    node_0_1.pk,
+                                    {
+                                        "node": node_0_1,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                                (
+                                    node_0_2.pk,
+                                    {
+                                        "node": node_0_2,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                            )
+                        ),
+                    },
+                ),
+                (
+                    node_1.pk,
+                    {
+                        "node": node_1,
+                        "children": OrderedDict(
+                            (
+                                (
+                                    node_1_0.pk,
+                                    {
+                                        "node": node_1_0,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                                (
+                                    node_1_1.pk,
+                                    {
+                                        "node": node_1_1,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                                (
+                                    node_1_2.pk,
+                                    {
+                                        "node": node_1_2,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                            )
+                        ),
+                    },
+                ),
+                (
+                    node_2.pk,
+                    {
+                        "node": node_2,
+                        "children": OrderedDict(
+                            (
+                                (
+                                    node_2_0.pk,
+                                    {
+                                        "node": node_2_0,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                                (
+                                    node_2_1.pk,
+                                    {
+                                        "node": node_2_1,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                                (
+                                    node_2_2.pk,
+                                    {
+                                        "node": node_2_2,
+                                        "children": OrderedDict(),
+                                    },
+                                ),
+                            )
+                        ),
+                    },
+                ),
+            )
+        )
 
         self.assertDictEqual(node_tree, expected_node_tree)

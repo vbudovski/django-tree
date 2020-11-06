@@ -86,17 +86,17 @@ class BaseTreeNodeManager(models.Manager):
             insert_into = node_tree
             for node_id in paths[node.pk]:
                 if node_id in insert_into:
-                    insert_into = insert_into[node_id]['children']
+                    insert_into = insert_into[node_id]["children"]
                 else:
                     insert_into[node_id] = {
-                        'node': node,
-                        'children': OrderedDict(),
+                        "node": node,
+                        "children": OrderedDict(),
                     }
 
         return node_tree
 
     @transaction.atomic
-    def _remove(self, this: 'BaseTreeNode'):
+    def _remove(self, this: "BaseTreeNode"):
         # Save the nodes on either side of 'this' node.
         this_previous = this.previous
         try:
@@ -107,27 +107,27 @@ class BaseTreeNodeManager(models.Manager):
         # Unlink 'this' node from the tree.
         this.previous = None
         this.parent = None
-        this.save(update_fields=['previous', 'parent'])
+        this.save(update_fields=["previous", "parent"])
 
         # Join the nodes on either side of 'this' to bridge the gap.
         if this_next:
             this_next.previous = this_previous
-            this_next.save(update_fields=['previous'])
+            this_next.save(update_fields=["previous"])
 
     @transaction.atomic
-    def insert_before(self, before: 'BaseTreeNode', this: 'BaseTreeNode'):
+    def insert_before(self, before: "BaseTreeNode", this: "BaseTreeNode"):
         self._remove(this)
 
         # Link 'this' before 'before'.
         before_previous = before.previous
         before.previous = this
-        before.save(update_fields=['previous'])
+        before.save(update_fields=["previous"])
         this.previous = before_previous
         this.parent = before.parent
-        this.save(update_fields=['previous', 'parent'])
+        this.save(update_fields=["previous", "parent"])
 
     @transaction.atomic
-    def insert_after(self, after: 'BaseTreeNode', this: 'BaseTreeNode'):
+    def insert_after(self, after: "BaseTreeNode", this: "BaseTreeNode"):
         self._remove(this)
 
         # Link 'this' after 'after.
@@ -137,18 +137,22 @@ class BaseTreeNodeManager(models.Manager):
             pass
         else:
             after_next.previous = this
-            after_next.save(update_fields=['previous'])
+            after_next.save(update_fields=["previous"])
 
         this.previous = after
         this.parent = after.parent
-        this.save(update_fields=['previous', 'parent'])
+        this.save(update_fields=["previous", "parent"])
 
 
 class BaseTreeNode(models.Model):
     objects = BaseTreeNodeManager()
 
-    parent = models.ForeignKey('self', related_name='children', null=True, on_delete=models.PROTECT)
-    previous = models.OneToOneField('self', related_name='next', null=True, on_delete=models.PROTECT)
+    parent = models.ForeignKey(
+        "self", related_name="children", null=True, on_delete=models.PROTECT
+    )
+    previous = models.OneToOneField(
+        "self", related_name="next", null=True, on_delete=models.PROTECT
+    )
 
     class Meta:
         abstract = True

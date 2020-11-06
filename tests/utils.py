@@ -21,11 +21,13 @@ from tests.models import TreeNode
 
 
 @transaction.atomic
-def add_children(parent: Optional[TreeNode], depth: int, max_depth: int, nodes_per_level: int):
+def add_children(
+    parent: Optional[TreeNode], depth: int, max_depth: int, nodes_per_level: int
+):
     if parent is None:
-        prefix = ''
+        prefix = ""
     else:
-        prefix = f'{parent.name}_'
+        prefix = f"{parent.name}_"
 
     nodes = []
     for i in range(nodes_per_level):
@@ -34,7 +36,9 @@ def add_children(parent: Optional[TreeNode], depth: int, max_depth: int, nodes_p
         except IndexError:
             previous = None
 
-        new_node = TreeNode.objects.create(name=f'{prefix}{i}', parent=parent, previous=previous)
+        new_node = TreeNode.objects.create(
+            name=f"{prefix}{i}", parent=parent, previous=previous
+        )
         nodes.append(new_node)
 
     if depth < max_depth:
