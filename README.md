@@ -11,8 +11,8 @@ A tree structure for hierarchical data. Optimised for fast insertion/moving of n
 
 ## Requirements
 
-* Django 2.2+
-* Python 3.6+
+* Django 3.2+
+* Python 3.8+
 
 
 ## Installation
@@ -39,3 +39,9 @@ class Category(BaseTreeNode):
 # Will contain an OrderedDict of categories organised into a tree structure.
 categories = Category.objects.build_tree()
 ```
+
+## Testing
+
+1. Install dev dependencies: `poetry install`.
+2. Install a supported version of Django: `pip install django==3.2`
+3. Run the tests: `DB_NAME="django_tree" python -m pytest tests .`
