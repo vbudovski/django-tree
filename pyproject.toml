@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "django-tree"
+name = "django-orderable-tree"
 version = "0.1.0"
 description = "Tree structure for hierarchical data"
 readme = "README.md"
@@ -37,7 +37,7 @@ homepage = "https://github.com/vbudovski/django-tree"
 
 
 [tool.poetry]
-name = "django-tree"
+name = "django-orderable-tree"
 version = "0.1.0"
 description = "Tree structure for hierarchical data"
 authors = [ "Vitaly Budovski <vbudovski@gmail.com>" ]
